@@ -1,11 +1,13 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { Input } from "./ui/input";
 import { Camera, Upload } from "lucide-react";
 import { Button } from "./ui/button";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { processImageSearch } from "@/actions/home";
+import useFetch from "@/hooks/use-fetch";
 
 const HomeSearch = () => {
   const [searchTerm, setSearchTerm] = React.useState("");
@@ -14,6 +16,13 @@ const HomeSearch = () => {
   const [searchImage, setSearchImage] = React.useState<File | null>(null);
   const [isUploading, setIsUploading] = React.useState(false);
   const router = useRouter();
+
+  const {
+    isLoading: isImageSearchLoading,
+    fn: processImageSearchFn,
+    data: imageSearchResult,
+    error: imageSearchError,
+  } = useFetch(processImageSearch);
 
   const handleTextSubmit = (
     e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>
@@ -33,7 +42,31 @@ const HomeSearch = () => {
       toast.error("Please upload an image first.");
       return;
     }
+    await processImageSearchFn(searchImage);
   };
+  useEffect(() => {
+    if (imageSearchError) {
+      toast.error("Error processing image search. Please try again.");
+      setIsUploading(false);
+      return;
+    }
+  }, [imageSearchError]);
+
+  useEffect(() => {
+    if (imageSearchResult?.success) {
+      const params = new URLSearchParams();
+      if (imageSearchResult.data?.make) {
+        params.set("make", imageSearchResult.data.make);
+      }
+      if (imageSearchResult.data?.bodyType) {
+        params.set("bodyType", imageSearchResult.data.bodyType);
+      }
+      if (imageSearchResult.data?.color) {
+        params.set("color", imageSearchResult.data.color);
+      }
+      router.push(`/cars?${params.toString()}`);
+    }
+  }, [imageSearchResult, router]);
   const onDrop = (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     if (file) {
@@ -108,6 +141,7 @@ const HomeSearch = () => {
                     className="h-40 object-contain mb-4"
                   />
                   <Button
+                    className="cursor-pointer"
                     variant={"outline"}
                     onClick={() => {
                       setImagePreview("");
@@ -143,10 +177,14 @@ const HomeSearch = () => {
             {imagePreview && (
               <Button
                 type="submit"
-                className="w-full mt-2"
-                disabled={isUploading}
+                className="w-full mt-2 cursor-pointer"
+                disabled={isUploading || isImageSearchLoading}
               >
-                {isUploading ? "Uploading" : "Search with this image"}
+                {isUploading
+                  ? "Uploading"
+                  : isImageSearchLoading
+                    ? "Analyzing Image"
+                    : "Search with this image"}
               </Button>
             )}
           </form>
@@ -155,5 +193,4 @@ const HomeSearch = () => {
     </div>
   );
 };
-
 export default HomeSearch;

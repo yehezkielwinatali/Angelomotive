@@ -1,12 +1,11 @@
 import AddCarForm from "./_components/add-car-form";
 
-// Make sure the file exists at the specified path, or update the path if necessa
 export const metadata = {
-  title: "Add new cars | Angelomotive Admin",
-  description: "Manage cars in your marketplace",
+  title: "Add New Car | Vehiql Admin",
+  description: "Add a new car to the marketplace",
 };
 
-export default function CarsPage() {
+export default function AddCarPage() {
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Add New Car</h1>

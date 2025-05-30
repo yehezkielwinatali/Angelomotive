@@ -5,19 +5,46 @@ import {
   saveWorkingHours,
   updateUserRole,
 } from "@/actions/settings";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useFetch from "@/hooks/use-fetch";
-import { Clock, Shield } from "lucide-react";
+import {
+  CheckCircle,
+  Clock,
+  Loader,
+  Loader2,
+  Save,
+  Search,
+  Shield,
+  Users,
+} from "lucide-react";
 import React, { useEffect } from "react";
 import { toast } from "sonner";
 const DAYS = [
@@ -44,9 +71,17 @@ const SettingsForm = () => {
     React.useState(false);
   const [userToPromote, setUserToPromote] = React.useState<{
     id: string;
+    email?: string;
+    name?: string;
   } | null>(null);
   const [confirmRemoveDialog, setConfirmRemoveDialog] = React.useState(false);
-  const [userToDemote, setUserToDemote] = React.useState<{ id: string } | null>(
+  interface UserToDemote {
+    id: string;
+    name?: string;
+    email: string;
+  }
+
+  const [userToDemote, setUserToDemote] = React.useState<UserToDemote | null>(
     null
   );
 
@@ -150,6 +185,11 @@ const SettingsForm = () => {
     }
   }, [saveResult, updateResult]);
 
+  useEffect(() => {
+    if (updateError) {
+      toast.error("Failed to update user role");
+    }
+  }, [updateError]);
   const handleWorkingHourChange = (
     index: number,
     field: string,
@@ -214,12 +254,15 @@ const SettingsForm = () => {
                     key={day.value}
                     className="grid grid-cols-12 gap-4 items-center py-3 px-4 rounded-lg hover:bg-slate-50"
                   >
-                    <div className="col-span-3 font-medium">{day.label}</div>
+                    <div className="col-span-3 md:col-span-2">
+                      <div className="font-medium">{day.label}</div>
+                    </div>
+
                     <div className="col-span-9 md:col-span-2 flex items-center">
                       <Checkbox
                         id={`is-open-${day.value}`}
                         checked={workingHours[index]?.isOpen}
-                        onCheckedChange={(checked: boolean) => {
+                        onCheckedChange={(checked) => {
                           handleWorkingHourChange(index, "isOpen", checked);
                         }}
                       />
@@ -230,16 +273,269 @@ const SettingsForm = () => {
                         {workingHours[index]?.isOpen ? "Open" : "Closed"}
                       </Label>
                     </div>
+
+                    {workingHours[index]?.isOpen && (
+                      <>
+                        <div className="col-span-5 md:col-span-4">
+                          <div className="flex items-center">
+                            <Clock className="h-4 w-4 text-gray-400 mr-2" />
+                            <Input
+                              type="time"
+                              value={workingHours[index]?.openTime}
+                              onChange={(e) =>
+                                handleWorkingHourChange(
+                                  index,
+                                  "openTime",
+                                  e.target.value
+                                )
+                              }
+                              className="text-sm"
+                            />
+                          </div>
+                        </div>
+                        <div className="text-center col-span-1">to</div>
+                        <div className="col-span-5 md:col-span-3">
+                          <Input
+                            type="time"
+                            value={workingHours[index]?.closeTime}
+                            onChange={(e) =>
+                              handleWorkingHourChange(
+                                index,
+                                "closeTime",
+                                e.target.value
+                              )
+                            }
+                            className="text-sm"
+                          />
+                        </div>
+                      </>
+                    )}
+
+                    {!workingHours[index]?.isOpen && (
+                      <div className="col-span-11 md:col-span-8 text-gray-500 italic text-sm">
+                        Closed all day
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
+
+              <div className="mt-6 flex justify-end">
+                <Button onClick={handleSaveHours} disabled={savingsHours}>
+                  {savingsHours ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      {" "}
+                      <Save className="mr-2 h-4 w-4" />
+                      Save Working Hours
+                    </>
+                  )}
+                </Button>
+              </div>
             </CardContent>
-            <CardFooter>
-              <p>Card Footer</p>
-            </CardFooter>
           </Card>
         </TabsContent>
-        <TabsContent value="password">Change your password here.</TabsContent>
+
+        {/* admin */}
+        <TabsContent value="admins" className="space-y-6 mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Admin Users</CardTitle>
+              <CardDescription>
+                Manage admin users who have elevated permissions.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="mb-6 relative">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
+                <Input
+                  type="search"
+                  placeholder="Search user..."
+                  className="pl-9 w-full"
+                  value={userSearch}
+                  onChange={(e) => setUserSearch(e.target.value)}
+                />
+              </div>
+              {fetchingUsers ? (
+                <div className="py-12 flex justify-center">
+                  <Loader className="h-8 w-8 animate-spin text-gray-500" />
+                </div>
+              ) : usersData?.success && filteredUsers.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>User</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Role</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredUsers.map((user: any) => (
+                        <TableRow key={user.id}>
+                          <TableCell className="font-medium">
+                            <div className="flex items-center gap-2">
+                              <div className="w-8 h-8 rounded-full bg bg-gray-200 flex items-center justify-center overflow-hidden">
+                                {user.imageUrl ? (
+                                  <img
+                                    src={user.imageUrl}
+                                    alt={user.name || "User Avatar"}
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <Users className="h-4 w-4 text-gray-500" />
+                                )}
+                              </div>
+                              <span>{user.name || "Unnamed User"}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell>{user.email}</TableCell>
+                          <TableCell>
+                            <Badge
+                              className={
+                                user.role === "ADMIN"
+                                  ? "bg-green-800"
+                                  : "bg-gray-800"
+                              }
+                            >
+                              {user.role}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {user.role === "ADMIN" ? (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setUserToDemote({
+                                    id: user.clerkUserId,
+                                    email: user.email,
+                                    name: user.name,
+                                  });
+                                  setConfirmRemoveDialog(true);
+                                }}
+                                disabled={updatingUserRole}
+                              >
+                                Remove Admin
+                              </Button>
+                            ) : (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setUserToPromote({ id: user.clerkUserId });
+                                  setConfirmAdminDialogOpen(true);
+                                }}
+                                disabled={updatingUserRole}
+                              >
+                                Make Admin
+                              </Button>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              ) : (
+                <div className="py-12 text-center">
+                  <Users className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-1">
+                    No users found
+                  </h3>
+                  <p className="text-gray-500">
+                    {userSearch
+                      ? "No users match your search criteria"
+                      : "There are no users registered yet"}
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Confirm Admin Dialog */}
+          <Dialog
+            open={confirmAdminDialogOpen}
+            onOpenChange={setConfirmAdminDialogOpen}
+          >
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Confirm Admin Privileges</DialogTitle>
+                <DialogDescription>
+                  Are you sure you want to give admin privileges to{" "}
+                  {userToPromote?.name || userToPromote?.email}? Admin users can
+                  manage all aspects of the dealership.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => setConfirmAdminDialogOpen(false)}
+                  disabled={updatingUserRole}
+                >
+                  Cancel
+                </Button>
+                <Button onClick={handleMakeAdmin} disabled={updatingUserRole}>
+                  {updatingUserRole ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Confirming...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="mr-2 h-4 w-4" />
+                      Confirm
+                    </>
+                  )}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+          {/* Confirm Remove Admin Dialog */}
+          <Dialog
+            open={confirmRemoveDialog}
+            onOpenChange={setConfirmRemoveDialog}
+          >
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Remove Admin Privileges</DialogTitle>
+                <DialogDescription>
+                  Are you sure you want to remove admin privileges from{" "}
+                  {userToDemote?.name || userToDemote?.email}? They will no
+                  longer be able to access the admin dashboard.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => setConfirmRemoveDialog(false)}
+                  disabled={updatingUserRole}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={handleRemoveAdmin}
+                  disabled={updatingUserRole}
+                >
+                  {updatingUserRole ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Removing...
+                    </>
+                  ) : (
+                    "Remove Admin"
+                  )}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </TabsContent>
       </Tabs>
     </div>
   );
