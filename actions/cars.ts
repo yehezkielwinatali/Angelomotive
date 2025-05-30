@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import { db } from "@/lib/prisma";
 import { createClient } from "@/lib/supabase";
 import { auth } from "@clerk/nextjs/server";
-import { searilizedCarData } from "@/lib/helper";
+import { serializeCarData } from "@/lib/helper";
 
 export async function fileToBase64(file: File): Promise<string> {
   const bytes = await file.arrayBuffer();
@@ -215,7 +215,7 @@ export async function getCars(search = "") {
       orderBy: { createdAt: "desc" },
     });
 
-    const searilizedCars = cars.map((car) => searilizedCarData(car));
+    const searilizedCars = cars.map((car) => serializeCarData(car));
     return {
       success: true,
       data: searilizedCars,

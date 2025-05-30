@@ -1,9 +1,11 @@
 import type { NextConfig } from "next";
-import { headers } from "next/headers";
-
+/** @type {import('next').NextConfig} */
 const nextConfig: NextConfig = {
   experimental: {
     serverComponentsHmrCache: false,
+    serverActions: {
+      bodySizeLimit: "10mb",
+    },
   },
 
   images: {

@@ -109,19 +109,22 @@ const Page = () => {
             </div>
 
             {/* Text */}
-            <div className="w-full md:w-1/2 flex flex-col justify-center mt-4">
-              <h2 className="text-3xl md:text-4xl font-semibold text-gray-900 mb-3 gradient-title">
+            <div className="w-full md:w-1/2 flex flex-col justify-center mt-6 px-4 sm:px-6">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-900 mb-4 gradient-title md:mt-20">
                 Why Choose Our Platform
               </h2>
-              <p className="text-gray-700 text-lg leading-relaxed font-light">
-                Angelomotive makes car buying simple, safe, <br />
-                and tailored to your lifestyle — <br /> with a massive
-                inventory, verified sellers, <br />
-                and hassle-free test drive bookings, <br />
+
+              <p className="text-gray-700 text-base sm:text-lg leading-relaxed font-light">
+                Angelomotive makes car buying simple, safe, and tailored to your
+                lifestyle —<br className="hidden sm:block" />
+                with a massive inventory, verified sellers,{" "}
+                <br className="hidden sm:block" />
+                and hassle-free test drive bookings,
+                <br className="hidden sm:block" />
                 all from the comfort of your screen.
               </p>
               <div>
-                <Button variant={"outline"} className="mt-5">
+                <Button variant={"outline"} className="mt-6 w-full sm:w-auto">
                   Click Here
                 </Button>
               </div>
