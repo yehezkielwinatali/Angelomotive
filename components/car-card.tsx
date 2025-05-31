@@ -1,11 +1,15 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { Card, CardContent } from "./ui/card";
 import Image from "next/image";
-import { CarIcon, Heart } from "lucide-react";
+import { CarIcon, Heart, Loader2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { useRouter } from "next/navigation";
+import { toggleSavedCar } from "@/actions/car-listing";
+import useFetch from "@/hooks/use-fetch";
+import { useAuth } from "@clerk/nextjs";
+import { toast } from "sonner";
 interface CarProps {
   car: {
     id: number;
@@ -22,11 +26,44 @@ interface CarProps {
     wishlisted: boolean;
   };
 }
+interface ToggleSaveEvent
+  extends React.MouseEvent<HTMLButtonElement, MouseEvent> {}
 
 const CarCard: React.FC<CarProps> = ({ car }) => {
   const [isSaved, setIsSaved] = React.useState(car.wishlisted);
-  const handleToggleSave = () => {};
+  const { isSignedIn } = useAuth();
   const router = useRouter();
+  const {
+    isLoading: isToggling,
+    data: toggleResult,
+    error: toggleError,
+    fn: toggleSavedCarFn,
+  } = useFetch(toggleSavedCar);
+
+  useEffect(() => {
+    if (toggleResult?.success && toggleResult.saved !== isSaved) {
+      setIsSaved(toggleResult.saved);
+      toast.success(toggleResult.message);
+    }
+  }, [toggleResult, isSaved]);
+
+  const handleToggleSave = async (e: ToggleSaveEvent): Promise<void> => {
+    e.preventDefault();
+    if (!isSignedIn) {
+      toast.error("Please sign in to save cars.");
+      router.push("/sign-in");
+      return;
+    }
+    if (isToggling) return;
+    await toggleSavedCarFn(car.id);
+  };
+
+  useEffect(() => {
+    if (toggleError) {
+      toast.error("Failed to toggle save status.");
+    }
+  }, [toggleError]);
+
   return (
     <Card className="overflow-hidden hover:shadow-lg transition group py-0">
       <div className="relative h-48">
@@ -46,11 +83,15 @@ const CarCard: React.FC<CarProps> = ({ car }) => {
         )}
         <Button
           variant={"ghost"}
-          className={`absolute top-2 right-2 bg-white/90 rounded-full p-1.5 ${isSaved ? "text-red-500 hover:text-red-600" : "text-gray-500 hover:text-gray-600"}`}
+          className={`absolute top-2 right-2 bg-white/90 rounded-full p-1.5 cursor-pointer ${isSaved ? "text-red-500 hover:text-red-600" : "text-gray-500 hover:text-gray-600"}`}
           size={"icon"}
           onClick={handleToggleSave}
         >
-          <Heart className={isSaved ? "fill-current" : ""} size={20} />
+          {isToggling ? (
+            <Loader2 className="animate-spin h-4 w-4" />
+          ) : (
+            <Heart className={isSaved ? "fill-current " : ""} size={20} />
+          )}
         </Button>
       </div>
       <CardContent className="p-4">
@@ -81,10 +122,10 @@ const CarCard: React.FC<CarProps> = ({ car }) => {
             {car.color}
           </Badge>
         </div>
-        <div className="flex justify-between">
+        <div className="flex justify-between ">
           <Button
             onClick={() => router.push(`/cars/${car.id}`)}
-            className="flex-1"
+            className="flex-1 cursor-pointer"
           >
             View Car
           </Button>

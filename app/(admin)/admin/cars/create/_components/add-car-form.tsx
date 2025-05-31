@@ -635,7 +635,7 @@ const AddCarForm = () => {
 
                 <Button
                   type="submit"
-                  className="w-full md:w-auto"
+                  className="w-full md:w-auto cursor-pointer"
                   disabled={addCarLoading}
                 >
                   {addCarLoading ? (
@@ -672,19 +672,21 @@ const AddCarForm = () => {
                       />
                       <div className="flex gap-2">
                         <Button
-                          variant="outline"
+                          variant="destructive"
                           size="sm"
                           onClick={() => {
                             setImagePreview(null);
                             setUploadedAiImage(null);
                             resetProcessImage();
                           }}
+                          className="cursor-pointer"
                         >
                           Remove
                         </Button>
                         <Button
                           onClick={processWithAI}
                           disabled={processImageLoading}
+                          className="cursor-pointer"
                           size="sm"
                         >
                           {processImageLoading ? (

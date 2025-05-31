@@ -266,10 +266,7 @@ const SettingsForm = () => {
                           handleWorkingHourChange(index, "isOpen", checked);
                         }}
                       />
-                      <Label
-                        htmlFor={`is-open-${day.value}`}
-                        className="ml-2 cursor-pointer"
-                      >
+                      <Label htmlFor={`is-open-${day.value}`} className="ml-2">
                         {workingHours[index]?.isOpen ? "Open" : "Closed"}
                       </Label>
                     </div>
@@ -321,7 +318,11 @@ const SettingsForm = () => {
               </div>
 
               <div className="mt-6 flex justify-end">
-                <Button onClick={handleSaveHours} disabled={savingsHours}>
+                <Button
+                  onClick={handleSaveHours}
+                  className="cursor-pointer"
+                  disabled={savingsHours}
+                >
                   {savingsHours ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -329,7 +330,6 @@ const SettingsForm = () => {
                     </>
                   ) : (
                     <>
-                      {" "}
                       <Save className="mr-2 h-4 w-4" />
                       Save Working Hours
                     </>
@@ -409,7 +409,7 @@ const SettingsForm = () => {
                           <TableCell className="text-right">
                             {user.role === "ADMIN" ? (
                               <Button
-                                variant="outline"
+                                variant="destructive"
                                 size="sm"
                                 onClick={() => {
                                   setUserToDemote({
@@ -420,6 +420,7 @@ const SettingsForm = () => {
                                   setConfirmRemoveDialog(true);
                                 }}
                                 disabled={updatingUserRole}
+                                className="cursor-pointer"
                               >
                                 Remove Admin
                               </Button>
@@ -432,6 +433,7 @@ const SettingsForm = () => {
                                   setConfirmAdminDialogOpen(true);
                                 }}
                                 disabled={updatingUserRole}
+                                className="cursor-pointer"
                               >
                                 Make Admin
                               </Button>
@@ -477,10 +479,15 @@ const SettingsForm = () => {
                   variant="outline"
                   onClick={() => setConfirmAdminDialogOpen(false)}
                   disabled={updatingUserRole}
+                  className="cursor-pointer"
                 >
                   Cancel
                 </Button>
-                <Button onClick={handleMakeAdmin} disabled={updatingUserRole}>
+                <Button
+                  onClick={handleMakeAdmin}
+                  disabled={updatingUserRole}
+                  className="cursor-pointer bg-green-800"
+                >
                   {updatingUserRole ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -515,6 +522,7 @@ const SettingsForm = () => {
                   variant="outline"
                   onClick={() => setConfirmRemoveDialog(false)}
                   disabled={updatingUserRole}
+                  className="cursor-pointer"
                 >
                   Cancel
                 </Button>
@@ -522,6 +530,7 @@ const SettingsForm = () => {
                   variant="destructive"
                   onClick={handleRemoveAdmin}
                   disabled={updatingUserRole}
+                  className="cursor-pointer"
                 >
                   {updatingUserRole ? (
                     <>

@@ -3,7 +3,6 @@
 import { serializeCarData } from "@/lib/helper";
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
-import { create } from "domain";
 
 export async function getCarFilters() {
   try {
@@ -346,7 +345,7 @@ export async function getCarById(carId: string) {
   }
 }
 
-async function getSavedCars() {
+export async function getSavedCars() {
   try {
     const { userId } = await auth();
     if (!userId) {

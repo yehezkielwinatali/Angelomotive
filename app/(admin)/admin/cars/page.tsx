@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function CarsPage() {
   return (
-    <div className="p-6">
+    <div className="py-6 px-8">
       <h1 className="text-2xl font-bold mb-6">Cars Management</h1>
       <CarList />
     </div>

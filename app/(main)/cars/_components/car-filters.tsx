@@ -296,7 +296,7 @@ export const CarFilters = ({ filters }: CarFiltersProps) => {
           </div>
 
           <div className="px-4 py-4 border-t">
-            <Button onClick={applyFilters} className="w-full">
+            <Button onClick={applyFilters} className="w-full cursor-pointer">
               Apply Filters
             </Button>
           </div>

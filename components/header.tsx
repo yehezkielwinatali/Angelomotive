@@ -1,5 +1,4 @@
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
-import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { Button } from "./ui/button";
@@ -13,7 +12,7 @@ const Header = async ({ isAdminPage = false }) => {
   return (
     <header className="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b">
       <nav className="mx-auto px-4 py-4 flex items-center justify-between">
-        <Link href={"isAdminPage ? '/admin' : '/'}>"} className="flex">
+        <Link href={isAdminPage ? "/admin" : "/"} className="flex">
           <h1 className="font-bold text-xl gradient-title">ANGELOMOTIVE</h1>
           {isAdminPage && (
             <span className="text-xs font-extralight">admin</span>
@@ -22,7 +21,10 @@ const Header = async ({ isAdminPage = false }) => {
         <div className="flex items-center space-x-4">
           {isAdminPage ? (
             <Link href={"/"}>
-              <Button variant={"outline"} className="flex items-center gap-2">
+              <Button
+                variant={"outline"}
+                className="flex items-center gap-2 cursor-pointer"
+              >
                 <ArrowLeft size={18} />
                 <span className="hidden md:inline cursor-pointer">
                   Back to App

@@ -37,7 +37,7 @@ const Page = async () => {
       </section>
 
       <section className="py-12 mb-10">
-        <div className="container mx-auto px-6">
+        <div className="container mx-auto px-8">
           <div className="flex justify-between items-center mb-5">
             <h2 className="text-2xl font-bold pl-1 gradient-title">
               Featured Cars
@@ -58,7 +58,7 @@ const Page = async () => {
       </section>
 
       <section className="py-2 mb-20">
-        <div className="container mx-auto px-6">
+        <div className="container mx-auto px-8">
           <div className="flex justify-between items-center mb-5">
             <h2 className="text-2xl font-bold pl-1 gradient-title">
               Browse by Brand
@@ -126,8 +126,12 @@ const Page = async () => {
                 all from the comfort of your screen.
               </p>
               <div>
-                <Button variant={"outline"} className="mt-6 w-full sm:w-auto">
-                  Click Here
+                <Button
+                  variant={"outline"}
+                  className="mt-6 w-full cursor-pointer sm:w-auto"
+                  asChild
+                >
+                  <Link href="/cars">Check Our Collections</Link>
                 </Button>
               </div>
             </div>
@@ -136,7 +140,7 @@ const Page = async () => {
       </section>
 
       <section className="py-12 ">
-        <div className="container mx-auto px-6">
+        <div className="container mx-auto px-8">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl font-bold gradient-title">
               Browse by Body Type
@@ -173,9 +177,9 @@ const Page = async () => {
         </div>
       </section>
 
-      <section className="py-12 mb-10">
-        <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold text-center mb-5 gradient-title">
+      <section id="faq" className="py-12 mb-10">
+        <div className="container mx-auto px-8">
+          <h2 className="text-4xl font-bold text-center mb-5 gradient-title">
             Frequently Asked Questions
           </h2>
           <Accordion type="single" collapsible className="w-full">

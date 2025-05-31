@@ -176,13 +176,13 @@ const CarList = () => {
       </div>
 
       <Card>
-        <CardContent className="p-0">
+        <CardContent>
           {loadingCars && !carsData ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="animate-spin h-6 w-6 text-gray-500" />
             </div>
           ) : carsData?.success && carsData.data.length > 0 ? (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto px-2">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -199,7 +199,7 @@ const CarList = () => {
                   {carsData.data.map((car: any) => (
                     <TableRow key={car.id}>
                       <TableCell>
-                        <div className="w-10 h-10 rounded-md overflow-hidden">
+                        <div className="w-13 h-13 rounded-md overflow-hidden">
                           {car.images && car.images.length > 0 ? (
                             <Image
                               src={car.images[0]}
