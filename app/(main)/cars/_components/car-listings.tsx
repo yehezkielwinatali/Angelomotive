@@ -113,7 +113,7 @@ const CarListings = () => {
         <Info className="h-4 w-4" />
         <AlertTitle>Error</AlertTitle>
         <AlertDescription>
-          Failed to load cars. Please try again later.
+          Failed to load cars. Please log in first.
         </AlertDescription>
       </Alert>
     );
